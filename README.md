@@ -14,9 +14,11 @@
 
 ---
 
-## 📸 Preview
+## 🖼️ App Preview
 
-> *(Screenshots)*
+| Search | Results |
+|--------|---------|
+| ![Search Box](screenshots/search.png) | ![Lyrics Display](screenshots/results.png) |
 
 ---
 
