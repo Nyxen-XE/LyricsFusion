@@ -4,15 +4,44 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import JavascriptException
 from fuzzywuzzy import fuzz
 import requests
 import logging
 import re
 
-chrome_options = Options()
-chrome_options.add_argument("--log-level=3")  # Only show FATAL logs
-chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])  # Hide DevTools logs
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")
+options.add_argument("--disable-gpu")
+options.add_argument("--no-sandbox")
+options.add_argument("--window-size=1920,1080")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--enable-unsafe-swiftshader")
+# This can trick some detection
+options.add_argument("--disable-blink-features=AutomationControlled")
+
+
+# Set a legit user-agent
+options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                     "AppleWebKit/537.36 (KHTML, like Gecko) "
+                     "Chrome/120.0.0.0 Safari/537.36")
+
+
+
+# JavaScript patches to spoof navigator properties
+stealth_js = """
+Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+Object.defineProperty(navigator, 'languages', {get: () => ['en-US', 'en']});
+Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
+Object.defineProperty(navigator, 'platform', {get: () => 'Win32'});
+Object.defineProperty(navigator, 'chrome', {get: () => { return { runtime: {} }; }});
+"""
+
+
+
+
+options.add_argument("--log-level=3")  # Only show FATAL logs
+options.add_experimental_option('excludeSwitches', ['enable-logging'])  # Hide DevTools logs
 service = Service()
 
 from time import sleep
@@ -36,14 +65,18 @@ def is_match(scraped_name, input_name, threshold=70):
 
 def click_show_more():
     try:
-        show_more_btn = WebDriverWait(browser, 10).until(
-            EC.presence_of_element_located((By.XPATH, '/html/body/routable-page/ng-outlet/search-results-page/div/div[2]/div[1]/div[2]/search-result-section/div/a'))
-        )
-        logger.info("Show more songs button found. Clicking...")
-        show_more_btn.click()
-    except TimeoutException:
-        logger.error("Show more songs button not found or timed out.")
-        return False
+        browser.execute_script("""
+        const atag = document.querySelector("body > routable-page > ng-outlet > search-results-page > div > div.column_layout > div.column_layout-column_span.column_layout-column_span--primary > div:nth-child(2) > search-result-section > div > a")
+        atag.click()
+            """)
+        # show_more_btn = WebDriverWait(browser, 10).until(
+        #     EC.element_to_be_clickable((By.XPATH, '/html/body/routable-page/ng-outlet/search-results-page/div/div[2]/div[1]/div[2]/search-result-section/div/a'))
+        # )
+        #show_more_btn = browser.find_element(By.XPATH,'/html/body/routable-page/ng-outlet/search-results-page/div/div[2]/div[1]/div[2]/search-result-section/div/a')
+        #logger.info("Show more songs button found. Clicking...")
+    except JavascriptException as e:
+        logger.error(e)
+        return False 
     return True
 
 def clean_text(text):
@@ -53,6 +86,8 @@ def clean_text(text):
 
 def find_song_and_open(artistName, trackName):
     global trackTitle
+    global trackLink
+    trackLink = ''
     trackTitle = ''
     try:
         print("⏳ Waiting for page to render...")
@@ -96,6 +131,7 @@ def find_song_and_open(artistName, trackName):
             if is_match(track_clean, card_title) and is_match(artist_clean, card_subtitle):
                 print(f"🎯 Match found: {card['title']} by {card['subtitle']}")
                 trackTitle = card['title'] + ' by ' + card['subtitle']
+                trackLink = card['link']
                 print(f"🔗 Opening link: {card['link']}")
                 found = True
                 browser.get(card['link'])
@@ -149,7 +185,12 @@ def scrape_lyrics(artistName, trackName):
     try: 
         global browser
         global trackTitle
-        browser = webdriver.Chrome(service=service, options=chrome_options) 
+        global trackLink
+        browser = webdriver.Chrome(service=service, options=options) 
+        # Inject the stealth patches
+        browser.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+             "source": stealth_js
+            })
         logger.info("Launching Genius search...")
         browser.implicitly_wait(5)
         browser.get(f'https://genius.com/search?q={artistName}+{trackName}')
@@ -164,7 +205,11 @@ def scrape_lyrics(artistName, trackName):
         lyrics = extract_lyrics()
         if lyrics:
             logger.info("Lyrics found!")
-            lyricsData = {"track_title": trackTitle, 'artist': artistName, 'track': trackName, 'lyrics': lyrics + "\n"}
+            lyricsData = {"track_title": trackTitle, 
+                          'track_link': trackLink, 
+                          'artist': artistName,
+                            'track': trackName,
+                              'lyrics': lyrics + "\n"}
             return lyricsData
         else:
             logger.error("No lyrics found.")
