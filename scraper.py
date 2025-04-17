@@ -1,3 +1,40 @@
+import time,os
+# === Splash screen function ===
+def show_splash():
+    os.system("cls" if os.name == "nt" else "clear")
+    splash = r"""
+ ███╗   ██╗██╗   ██╗██╗  ██╗███████╗███╗   ██╗     ███████╗ ██████╗██████╗ 
+ ████╗  ██║██║   ██║██║ ██╔╝██╔════╝████╗  ██║     ██╔════╝██╔════╝██╔══██╗
+ ██╔██╗ ██║██║   ██║█████╔╝ █████╗  ██╔██╗ ██║     █████╗  ██║     ██████╔╝
+ ██║╚██╗██║██║   ██║██╔═██╗ ██╔══╝  ██║╚██╗██║     ██╔══╝  ██║     ██╔═══╝ 
+ ██║ ╚████║╚██████╔╝██║  ██╗███████╗██║ ╚████║     ███████╗╚██████╗██║     
+ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝     ╚══════╝ ╚═════╝╚═╝     
+    """
+    print(splash)
+    print("⏳ Initializing GeniusScraper v1.0 - by Nyxen-XE")
+    time.sleep(2)
+    print("🕵️  Activating Stealth Browser Mode...")
+    time.sleep(1.2)
+    print("🔍 Loading Genius Search Interface...")
+    time.sleep(1.2)
+    print("🧠 Injecting Anti-Bot Scripts...")
+    time.sleep(1)
+    print("🚀 Ready to scrape. Let the hunt begin.\n")
+    time.sleep(1)
+    os.system("cls" if os.name == "nt" else "clear")  # clear console after splash
+
+# === Call splash screen before GUI ===
+show_splash()
+
+# === Now your original GUI script loads ===
+# (Paste your full GUI code below, which you've already written)
+
+
+
+
+
+
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait

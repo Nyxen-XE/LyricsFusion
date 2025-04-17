@@ -3,6 +3,18 @@ from tkinter import filedialog, messagebox
 import threading, os, requests
 import webbrowser
 
+import sys
+import os
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller EXE """
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 track_title = ''
 file_path = None
@@ -181,13 +193,16 @@ customtkinter.set_default_color_theme('green')
 
 root = customtkinter.CTk()
 root.title("LyricsFusion")
-root.geometry('870x500')
 
+root.iconbitmap(resource_path("lyricsfusion.ico"))
+
+root.geometry('870x500')
 frame = customtkinter.CTkFrame(root, width=860, height=490)
 frame.grid(row=0, column=0, pady=5, padx=5, sticky='nsew')
 
 title = customtkinter.CTkLabel(frame, text='LyricsFusion', font=('Arial Bold', 35))
 title.place(y=50, x=70)
+
 
 optionMenu = customtkinter.CTkOptionMenu(frame,
     values=["Open file", 
@@ -252,5 +267,8 @@ yt_label.place(y=460,x=135)
 
 
 
+
 root.resizable(False, False)
 root.mainloop()
+
+
