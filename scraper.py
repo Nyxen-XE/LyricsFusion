@@ -43,6 +43,12 @@ Object.defineProperty(navigator, 'chrome', {get: () => { return { runtime: {} };
 options.add_argument("--log-level=3")  # Only show FATAL logs
 options.add_experimental_option('excludeSwitches', ['enable-logging'])  # Hide DevTools logs
 service = Service()
+browser = webdriver.Chrome(service=service,options=options)
+   # Inject the stealth patches
+browser.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+             "source": stealth_js
+            })
+
 
 from time import sleep
 # Setup logging
@@ -155,6 +161,9 @@ def extract_lyrics():
         lyricsRoot = WebDriverWait(browser,5).until(EC.presence_of_element_located((By.ID,'lyrics-root')))
         lyrics = ''
         if lyricsRoot:
+            browser.execute_script("""
+            window.stop()
+                """)
             lyricsContainer = lyricsRoot.find_elements(By.CSS_SELECTOR,'.Lyrics__Container-sc-78fb6627-1')
             for l in lyricsContainer:
                 lyrics += l.text
@@ -167,9 +176,9 @@ def extract_lyrics():
 
 
 def scrape_lyrics(artistName, trackName):
-    if not internet_connection():
-        logger.error("No internet connection. Please check your connection.")
-        return None
+    # if not internet_connection():
+    #     logger.error("No internet connection. Please check your connection.")
+    #     return None
     if not artistName or not trackName:
         logger.error("Please provide both artist and track names.")
         return None
@@ -186,11 +195,8 @@ def scrape_lyrics(artistName, trackName):
         global browser
         global trackTitle
         global trackLink
-        browser = webdriver.Chrome(service=service, options=options) 
-        # Inject the stealth patches
-        browser.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-             "source": stealth_js
-            })
+     
+     
         logger.info("Launching Genius search...")
         browser.implicitly_wait(5)
         browser.get(f'https://genius.com/search?q={artistName}+{trackName}')
