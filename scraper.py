@@ -26,12 +26,12 @@ class ColorFormatter(logging.Formatter):
             color = Fore.RED
 
         level_symbol = {
-            logging.INFO: "ℹ️",
-            logging.WARNING: "⚠️",
-            logging.ERROR: "❌",
-            logging.DEBUG: "🔍",
-            logging.CRITICAL: "💥"
-        }.get(record.levelno, "🔸")
+            logging.INFO: "",
+            logging.WARNING: "",
+            logging.ERROR: "",
+            logging.DEBUG: "",
+            logging.CRITICAL: ""
+        }.get(record.levelno, "")
 
         msg = super().format(record)
         return f"{color}{level_symbol} [{tag}] {Style.RESET_ALL}{msg}"
@@ -59,17 +59,17 @@ def show_splash():
  ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝     ╚══════╝ ╚═════╝╚═╝     
     """
     print(splash)
-    logger.info("⏳ Initializing GeniusScraper v1.0 - by Nyxen-XE", extra={"tag": "SPLASH"})
+    logger.info("Initializing GeniusScraper v1.0 - by Nyxen-XE", extra={"tag": "SPLASH"})
     time.sleep(2)
-    logger.info("🕵️  Activating Stealth Browser Mode...", extra={"tag": "STEALTH"})
+    logger.info("Activating Stealth Browser Mode...", extra={"tag": "STEALTH"})
     
     time.sleep(1.2)
-    logger.info("🔍 Loading Genius Search Interface...", extra={"tag": "STEALTH"})
+    logger.info("Loading Genius Search Interface...", extra={"tag": "STEALTH"})
     
     time.sleep(1.2)
-    logger.info("🧠 Injecting Anti-Bot Scripts...", extra={"tag": "STEALTH"})
+    logger.info("Injecting Anti-Bot Scripts...", extra={"tag": "STEALTH"})
     time.sleep(1)
-    logger.info("🚀 Ready to scrape. Let the hunt begin.\n", extra={"tag": "STEALTH"})
+    logger.info("Ready to scrape. Let the hunt begin.\n", extra={"tag": "STEALTH"})
     time.sleep(1)
     os.system("cls" if os.name == "nt" else "clear")  # clear console after splash
 
@@ -165,7 +165,7 @@ def click_show_more():
         #show_more_btn = browser.find_element(By.XPATH,'/html/body/routable-page/ng-outlet/search-results-page/div/div[2]/div[1]/div[2]/search-result-section/div/a')
         logger.info("Show more songs button found. Clicking...", extra={"tag": "SCRAPER"})
     except JavascriptException as e:
-        logger.error("⚠️ Failed to click 'Show more' button. Page might have failed to load.", extra={"tag": "SCRAPER"})
+        logger.error("Failed to click 'Show more' button. Page might have failed to load.", extra={"tag": "SCRAPER"})
         #logger.error(f"Error: {e}", extra={"tag": "SCRAPER"})
         return False 
     return True
@@ -181,7 +181,7 @@ def find_song_and_open(artistName, trackName):
     trackLink = ''
     trackTitle = ''
     try:
-        logger.info("⏳ Waiting for page to render...", extra={"tag": "SCRAPER"})
+        logger.info("Waiting for page to render...", extra={"tag": "SCRAPER"})
         # Wait for the songs container to load
         sleep(5)
 
@@ -211,7 +211,7 @@ def find_song_and_open(artistName, trackName):
             logging.error("No results loaded. Page might have failed.", extra={"tag": "SCRAPER"})
             return
 
-        logger.info(f"✅ {len(allCards)} results fetched. Scanning...", extra={"tag": "SCRAPER"})
+        logger.info(f"{len(allCards)} results fetched. Scanning...", extra={"tag": "SCRAPER"})
         # Clean the track and artist names for comparison
         trackName = trackName.replace('feat.','').replace('ft.','').replace('(','').replace(')','').replace('[','').replace(']','').strip()
         artistName = artistName.replace('feat.','').replace('ft.','').replace('(','').replace(')','').replace('[','').replace(']','').strip()
@@ -224,10 +224,10 @@ def find_song_and_open(artistName, trackName):
             card_subtitle = clean_text(card['subtitle'])
 
             if is_match(track_clean, card_title) and is_match(artist_clean, card_subtitle):
-                logging.info(f"🎯 Match found: {card['title']} by {card['subtitle']}",extra={"tag": "SCRAPER"})
+                logging.info(f"Match found: {card['title']} by {card['subtitle']}",extra={"tag": "SCRAPER"})
                 trackTitle = card['title'] + ' by ' + card['subtitle']
                 trackLink = card['link']
-                logging.info(f"🔗 Opening link: {card['link']}",extra={"tag": "SCRAPER"})
+                logging.info(f"Opening link: {card['link']}",extra={"tag": "SCRAPER"})
                 time.sleep(1.5)
                 logger.warning("This might take a few seconds...", extra={"tag": "LYRICS"})
                 found = True
@@ -238,20 +238,19 @@ def find_song_and_open(artistName, trackName):
                 extract_lyrics()
                 break
         if not found:
-         logger.info("❌ Track not found in the search results.", extra={"tag": "SCRAPER"})
-         logger.info("❌ No matching track found. Please check the artist and track names.", extra={"tag": "SCRAPER"})
+         logger.info("Track not found in the search results.", extra={"tag": "SCRAPER"})
+         logger.info("No matching track found. Please check the artist and track names.", extra={"tag": "SCRAPER"})
          return False
         
     except TimeoutException:
-        logger.error("⚠️ Timeout: Songs container or result failed to load.", extra={"tag": "SCRAPER"})
-       
+        logger.error("Timeout: Songs container or result failed to load.", extra={"tag": "SCRAPER"})
+        
 
 
-        logger.error("⚠️ Please check your internet connection or try again later.", extra={"tag": "NET"})
 
 def extract_lyrics():
     try:
-        logger.info("📝 Waiting for lyrics to load...", extra={"tag": "LYRICS"})
+        logger.info("Waiting for lyrics to load...", extra={"tag": "LYRICS"})
 
         #lyricsRoot = browser.find_element(By.ID,'lyrics-root')
         lyricsRoot = WebDriverWait(browser,5).until(EC.presence_of_element_located((By.ID,'lyrics-root')))
@@ -267,8 +266,8 @@ def extract_lyrics():
                 
 
     except Exception as e:
-        logger.error(f"❌ Failed to extract lyrics: {e}", extra={"tag": "LYRICS"})
-        logger.error("⚠️ Lyrics not found. Page might have failed to load.", extra={"tag": "LYRICS"})
+        logger.error(f"Failed to extract lyrics: {e}", extra={"tag": "LYRICS"})
+        logger.error("Lyrics not found. Page might have failed to load.", extra={"tag": "LYRICS"})
         return None
 
 
