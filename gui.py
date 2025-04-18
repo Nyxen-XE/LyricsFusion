@@ -17,6 +17,7 @@ def resource_path(relative_path):
 
 
 track_title = ''
+auto_save = False
 file_path = None
 
 def internet_connection():
@@ -35,6 +36,15 @@ def folder_path():
 folder_path()
 
 
+def check_auto_save():
+    global auto_save
+    val = auto_save_checkBox.get()
+    if val == 'on':
+        auto_save = True
+        print("Auto save Lyrics enable")
+    else:
+        auto_save = False
+        print("Auto save Lyrics disabled")
 
 
 def open_in_browser(website):
@@ -78,6 +88,7 @@ def search_handler():
 
     def search():
             try:
+                global auto_save
                 from scraper import scrape_lyrics
                 feedback_label.configure(text=f"Searching for: {track_name} by {artist_name}")
                 results = scrape_lyrics(artist_name, track_name)
@@ -87,6 +98,8 @@ def search_handler():
                     track_title: object = results['track_title']
                     root.title(f"LyricsFusion - {track_title}")
                     textarea.insert("1.0", results['lyrics'])
+                    if auto_save:
+                        threading.Thread(target=save_file).start()
                 else:
                     feedback_label.configure(text="Lyrics not found" , text_color="#DE3163")
             except Exception as e:
@@ -181,7 +194,8 @@ def save_file():
             file_path = os.path.join(path, f"{filename}.txt")
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(content)
-        feedback_label.configure(text=f"File saved to: \n {file_path}")
+        feedback_label.configure(text="File saved to")
+        root.title(f"LyricsFusion - {track_title}| File saved to: {file_path}")
     except Exception as e:
         messagebox.showerror(title="Save Error", message=str(e))
         print(f"Failed to save file: {e}")
@@ -225,25 +239,37 @@ textarea.place(x=380, y=5)
 
 artist_name_entry = customtkinter.CTkEntry(frame, placeholder_text="Enter artist name",placeholder_text_color='#E0FFFF')
 artist_name_entry.configure(width=330, height=40)
-artist_name_entry.place(y=180, x=20)
+artist_name_entry.place(y=150, x=20)
 
 track_name_entry = customtkinter.CTkEntry(frame, placeholder_text="Enter track name",placeholder_text_color='#E0FFFF')
 track_name_entry.configure(width=330, height=40)
-track_name_entry.place(y=280, x=20)
+track_name_entry.place(y=250, x=20)
 
-feedback_label = customtkinter.CTkLabel(frame, text='', anchor='n')
-feedback_label.place(y=350, x=50)
+feedback_label = customtkinter.CTkLabel(frame, text='Searching for lyrics', anchor='n')
+feedback_label.place(y=320, x=50)
 
 submit_btn = customtkinter.CTkButton(frame,
                                      text="Search for lyrics",
                                      command=search_handler)
-submit_btn.place(y=400, x=20)
+submit_btn.place(y=350, x=20)
 submit_btn.configure(width=330, height=40)
 
+auto_save_var = customtkinter.StringVar(value='off')
 
-open_in_label = customtkinter.CTkLabel(root,text="Open In: ")
+auto_save_checkBox = customtkinter.CTkCheckBox(frame,text="Auto save Lyrics",
+                                            checkbox_width=15,
+                                            checkbox_height=15,
+                                            border_width=1,
+                                            variable=auto_save_var,
+                                            onvalue='on',
+                                            offvalue='off',
+                                            command=check_auto_save
+                                            )
+auto_save_checkBox.place(y=440,x=20)
 
-open_in_label.place(y=460,x=20)
+open_in_label = customtkinter.CTkLabel(root,text="Open: ")
+
+open_in_label.place(y=410,x=20)
 
 spotify_label = customtkinter.CTkButton(root,
                 text="Spotify",
@@ -253,7 +279,7 @@ spotify_label = customtkinter.CTkButton(root,
                 width=34,
                 command=lambda:open_in_browser("spotify")
                 )
-spotify_label.place(y=460,x=75)
+spotify_label.place(y=410,x=70)
 
 yt_label = customtkinter.CTkButton(root,
                 text="YouTube",
@@ -263,7 +289,7 @@ yt_label = customtkinter.CTkButton(root,
                 width=34,
                 command=lambda:open_in_browser("youtube")
                 )
-yt_label.place(y=460,x=135)
+yt_label.place(y=410,x=135)
 
 
 
