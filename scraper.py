@@ -26,12 +26,6 @@ def show_splash():
 # === Call splash screen before GUI ===
 show_splash()
 
-# === Now your original GUI script loads ===
-# (Paste your full GUI code below, which you've already written)
-
-
-
-
 
 
 
@@ -99,7 +93,7 @@ def internet_connection():
         logger.info("Internet connection is available.")
         return True
     except requests.ConnectionError:
-        logging.info("No internet connection")
+        logger.info("No internet connection")
         return False
 
 
@@ -116,7 +110,7 @@ def click_show_more():
         #     EC.element_to_be_clickable((By.XPATH, '/html/body/routable-page/ng-outlet/search-results-page/div/div[2]/div[1]/div[2]/search-result-section/div/a'))
         # )
         #show_more_btn = browser.find_element(By.XPATH,'/html/body/routable-page/ng-outlet/search-results-page/div/div[2]/div[1]/div[2]/search-result-section/div/a')
-        #logger.info("Show more songs button found. Clicking...")
+        logger.info("Show more songs button found. Clicking...")
     except JavascriptException as e:
         logger.error(e)
         return False 
@@ -133,7 +127,7 @@ def find_song_and_open(artistName, trackName):
     trackLink = ''
     trackTitle = ''
     try:
-        print("⏳ Waiting for page to render...")
+        logger.info("⏳ Waiting for page to render...")
         sleep(5)
 
         # Execute JavaScript to grab all mini song cards
@@ -159,10 +153,10 @@ def find_song_and_open(artistName, trackName):
         """)
 
         if not allCards:
-            print("🚫 No results loaded. Page might have failed.")
+            logging.error("No results loaded. Page might have failed.")
             return
 
-        print(f"✅ {len(allCards)} results fetched. Scanning...")
+        logger.info(f"✅ {len(allCards)} results fetched. Scanning...")
 
         track_clean = clean_text(trackName)
         artist_clean = clean_text(artistName)
@@ -172,28 +166,28 @@ def find_song_and_open(artistName, trackName):
             card_subtitle = clean_text(card['subtitle'])
 
             if is_match(track_clean, card_title) and is_match(artist_clean, card_subtitle):
-                print(f"🎯 Match found: {card['title']} by {card['subtitle']}")
+                logging.info(f"🎯 Match found: {card['title']} by {card['subtitle']}")
                 trackTitle = card['title'] + ' by ' + card['subtitle']
                 trackLink = card['link']
-                print(f"🔗 Opening link: {card['link']}")
+                logging.info(f"🔗 Opening link: {card['link']}")
                 found = True
                 browser.get(card['link'])
                 extract_lyrics()
                 break
         if not found:
 
-         print("❌ Track not found in the search results.")
+         logger.info("❌ Track not found in the search results.")
          return False
         
     except TimeoutException:
-        print("⚠️ Timeout: Songs container or result failed to load.")
+        logger.error("⚠️ Timeout: Songs container or result failed to load.")
        
 
 
 
 def extract_lyrics():
     try:
-        print("📝 Waiting for lyrics to load...")
+        logger.info("📝 Waiting for lyrics to load...")
         #lyricsRoot = browser.find_element(By.ID,'lyrics-root')
         lyricsRoot = WebDriverWait(browser,5).until(EC.presence_of_element_located((By.ID,'lyrics-root')))
         lyrics = ''
@@ -208,7 +202,7 @@ def extract_lyrics():
                 
 
     except Exception as e:
-        print(f"❌ Failed to extract lyrics: {e}")
+        logger.error(f"❌ Failed to extract lyrics: {e}")
         return None
 
 

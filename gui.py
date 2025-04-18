@@ -1,6 +1,7 @@
 import customtkinter
 from tkinter import filedialog, messagebox
 import threading, os, requests
+from PIL import Image
 import webbrowser
 
 import sys
@@ -80,20 +81,19 @@ def search_handler():
         messagebox.showwarning(title="Invalid input", message="Both artist name and track name are required")
         feedback_label.configure(text="Both artist name and track name are required", text_color="#DE3163")
         return None
-    threading.Thread(target=internet_connection).start()
     submit_btn.configure(state="disabled")
 
-    # if not internet_connection():
-    #     submit_btn.configure(state="disabled")
-    #     feedback_label.configure(text="No internet connection. Please check your connection.",text_color="#DE3163")
-    #     messagebox.showwarning(title='No internet', message='No internet connection. Please check your connection.')
-    #     return  None
+    if not internet_connection():
+        submit_btn.configure(state="disabled")
+        feedback_label.configure(text="No internet connection. Please check your connection.",text_color="#DE3163")
+        messagebox.showwarning(title='No internet', message='No internet connection. Please check your connection.')
+        return  None
+    feedback_label.configure(text=f"Searching for: {track_name} by {artist_name}")
 
     def search():
             try:
                 global auto_save
                 from scraper import scrape_lyrics
-                feedback_label.configure(text=f"Searching for: {track_name} by {artist_name}")
                 results = scrape_lyrics(artist_name, track_name)
                 if results:
                     feedback_label.configure(text="Lyrics found!")
