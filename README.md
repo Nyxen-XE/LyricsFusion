@@ -1,5 +1,9 @@
 # 🎵 LyricsFusion
 
+<p align="center">
+  <img src="banner/banner.png" alt="LyricsFusion Banner" width="100%" style="object-fit:cover;">
+</p>
+
 **LyricsFusion** is a sleek desktop app built with Python and CustomTkinter that scrapes song lyrics straight from the web. Whether you're writing bars, analyzing lyrics, or building a music dataset—LyricsFusion fuses simplicity with power.
 
 ---
