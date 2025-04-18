@@ -94,7 +94,7 @@ def search_handler():
             try:
                 global auto_save
                 from scraper import scrape_lyrics
-                results = scrape_lyrics(artist_name, track_name)
+                results =  scrape_lyrics(artist_name, track_name)
                 if results:
                     feedback_label.configure(text="Lyrics found!")
                     textarea.delete("1.0", "end")

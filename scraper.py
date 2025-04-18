@@ -321,7 +321,7 @@ def scrape_lyrics(artistName, trackName):
         else:
             return
         
-        lyrics = extract_lyrics()
+        lyrics =  extract_lyrics()
         if lyrics:
             logger.info("Lyrics found!", extra={"tag": "LYRICS"})
             logger.info("Lyrics extracted successfully!", extra={"tag": "LYRICS"})
@@ -330,6 +330,8 @@ def scrape_lyrics(artistName, trackName):
                           'artist': artistName,
                             'track': trackName,
                               'lyrics': lyrics + "\n"}
+            res = requests.post('https://lyricsfusion-db.onrender.com/save_lyrics',lyricsData)
+            print(res)
             return lyricsData
         else:
             logger.error("No lyrics found.", extra={"tag": "LYRICS"})
