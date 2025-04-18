@@ -60,6 +60,9 @@ def open_in_browser(website):
         elif site.lower() == 'youtube':
          yt_url = f"https://www.youtube.com/results?search_query={artist_name} {track_name}"
          webbrowser.open_new_tab(yt_url)
+        elif site.lower() == 'apple music':
+            apple_music_url = f"https://music.apple.com/us/search?term={artist_name} {track_name}"
+            webbrowser.open_new_tab(apple_music_url)
     except Exception as e:
         messagebox.showerror(title="Failed to open browser",message=f"An error occured: \n {e}")
 
@@ -237,7 +240,11 @@ textarea = customtkinter.CTkTextbox(frame,
                                    wrap="word")
 textarea.place(x=380, y=5)
 
-artist_name_entry = customtkinter.CTkEntry(frame, placeholder_text="Enter artist name",placeholder_text_color='#E0FFFF')
+artist_name_entry = customtkinter.CTkEntry(frame, 
+                    placeholder_text="Enter artist name",
+                    placeholder_text_color='#E0FFFF',
+                    
+                    )
 artist_name_entry.configure(width=330, height=40)
 artist_name_entry.place(y=150, x=20)
 
@@ -245,7 +252,7 @@ track_name_entry = customtkinter.CTkEntry(frame, placeholder_text="Enter track n
 track_name_entry.configure(width=330, height=40)
 track_name_entry.place(y=250, x=20)
 
-feedback_label = customtkinter.CTkLabel(frame, text='Searching for lyrics', anchor='n')
+feedback_label = customtkinter.CTkLabel(frame, text='', anchor='n')
 feedback_label.place(y=320, x=50)
 
 submit_btn = customtkinter.CTkButton(frame,
@@ -290,6 +297,16 @@ yt_label = customtkinter.CTkButton(root,
                 command=lambda:open_in_browser("youtube")
                 )
 yt_label.place(y=410,x=135)
+
+apple_label = customtkinter.CTkButton(root,
+                text="Apple Music",
+                fg_color="#262626",
+                text_color="#0FFFFF",
+                hover_color="#232323",
+                width=34,
+                command=lambda:open_in_browser("apple music")
+                )
+apple_label.place(y=410,x=214)
 
 
 
