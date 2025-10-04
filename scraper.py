@@ -259,7 +259,8 @@ def extract_lyrics():
             browser.execute_script("""
             window.stop()
                 """)
-            lyricsContainer = lyricsRoot.find_elements(By.CSS_SELECTOR,'.Lyrics__Container-sc-78fb6627-1')
+            lyricsContainer = lyricsRoot.find_elements(By.CSS_SELECTOR,'.Lyrics__Container-sc-cbcfa1dc-1')
+            
             for l in lyricsContainer:
                 lyrics += l.text
         return lyrics

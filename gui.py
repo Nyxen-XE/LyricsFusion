@@ -1,7 +1,7 @@
 import customtkinter
 from tkinter import filedialog, messagebox
 import threading, os, requests
-from PIL import Image
+# from PIL import Image
 import webbrowser
 
 import sys
